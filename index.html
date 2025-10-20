@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+  </head>
+  
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <!-- we import arjs version without NFT but with marker + location based support -->
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v5.0.0/dist/aframe-extras.min.js"></script>
+
+  <script>
+    AFRAME.registerComponent('registerevents', {
+      init: function () {
+        var marker = this.el;
+
+        marker.addEventListener('markerFound', function() {
+          var markerId = marker.id;
+          console.log('markerFound', markerId);
+
+          // TODO: Add your own code here to react to the marker being found.
+          toggleoverlay();
+          IsmessageOn = true;
+          message = returnmessage(markerId);
+          startTypewriter(markerId, message);
+        });
+
+        marker.addEventListener('markerLost', function() {
+          var markerId = marker.id;
+          console.log('markerLost', markerId);
+
+          // TODO: Add your own code here to react to the marker being lost.
+          toggleoverlay();
+          IsmessageOn = false;
+        });
+      }
+    });
+
+    let charIndex = 0;
+    let IsmessageOn = true;
+
+    function startTypewriter(markerId, message) {
+      if (!IsmessageOn) {
+        return;
+      }
+      const divelement = document.getElementById('screen-text-overlay');
+      divelement.style.display = 'flex';
+
+      const outputElement = document.getElementById('typewriter-output');
+      const fullMessage = message;
+      console.log(fullMessage)
+      const speed = 150; // 150ミリ秒/文字
+      
+      if (charIndex < fullMessage.length) {
+        // 一文字追加して表示を更新
+        outputElement.innerText = fullMessage.substring(0, charIndex + 1);
+        charIndex++;
+
+
+        // 次の文字を待つ
+        setTimeout(() => {
+          // 次回呼び出し時も同じ引数を使う
+          startTypewriter(markerId, message); 
+        }, speed);
+        
+      }
+    }
+
+    async function loadmessage() {
+      const response = await fetch('message.json');
+
+      if(!response.ok) {
+        console.log("JSONファイルを読み込めませんでした");
+      }
+
+      const JSONmessage = await response.json();
+      
+      return JSONmessage.characters;
+      
+    }
+
+    let charJSON;
+    
+    (async () => {
+      // loadmessage() の完了を待ち、解決された値（キャラクターデータ）を kuma 変数に代入する
+      charJSON = await loadmessage();
+      
+      // ここでは 'kuma' は Promise ではなく、データオブジェクトになっている
+      if (charJSON) {
+          console.log(charJSON); // 期待通りに "くま" が表示される
+      } else {
+          console.log("データが見つかりませんでした。");
+      }
+    })();
+    
+    function returnmessage(markerId) {
+      const charactersjson = charJSON.find(char => char.id === markerId);
+      return charactersjson.dialogue[0];
+    }
+
+    
+    function toggleoverlay() {
+      const overlay = document.getElementById('full-screen-overlay');
+      if (overlay.style.display == 'flex') {
+        overlay.style.display = 'none';
+      } else {
+        overlay.style.display = 'flex';
+      }
+    }
+
+    function showelement(id) {
+      const element = document.getElementById(id);
+      element.style.display = 'flex';
+    }
+
+    function hideelement(id) {
+      const element = document.getElementById(id);
+      element.style.display = 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 変更を監視するノードを選択
+      const targetNode = document.body;
+  
+      // (変更を監視する) オブザーバーのオプション
+      const config = { attributes: true, childList: true, subtree: true };
+  
+      // 変更が発見されたときに実行されるコールバック関数
+      const callback = (mutationList, observer) => {
+        for (const mutation of mutationList) {
+          mutation.addedNodes.forEach(node => {
+            if (node.id == 'error-popup') {
+              console.log('error-popupを発見しました！');
+
+              hideelement(node.id);
+              showelement('permission-denied-overlay');
+
+              hideelement('loading-overlay');
+              observer.disconnect();
+              return;
+              
+            } else if (node.id == 'arjs-video') {
+              console.log('video要素を発見しました');
+              
+              showelement('full-screen-overlay');
+              hideelement('loading-overlay');
+
+              observer.disconnect();
+              return;
+            }
+          });
+        }
+      };
+  
+      // コールバック関数に結びつけられたオブザーバーのインスタンスを生成
+      const observer = new MutationObserver(callback);
+  
+      // 対象ノードの設定された変更の監視を開始
+      observer.observe(targetNode, config);
+  
+      // その後で、監視を停止することができる
+      // observer.disconnect();
+    });
+  </script>
+  
+  <body style="margin : 0px; overflow: hidden;">
+
+    <div id="screen-text-overlay" style="
+        /* 配置とレイヤーはそのまま */
+        position: absolute; 
+        
+        /* 📌 修正点 1: bottom を指定 */
+        bottom: 20px; /* 画面下端から 20px 上に配置 */
+        
+        left: 50%; 
+        transform: translateX(-50%); /* 中央揃えのまま */
+        z-index: 1000; 
+
+        /* 背景とボーダーの設定 */
+        color: white; 
+        background-color: rgba(0, 0, 0, 0.8); 
+        padding: 10px; 
+        font-family: 'DotGothic16', sans-serif;
+        border: 3px solid white; 
+        border-radius: 8px; 
+
+        display: none;
+    ">
+        <p id="typewriter-output"></p>
+    </div>
+
+    <div id="full-screen-overlay" style="
+      position: absolute; 
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7); /* 半透明の黒 (70%不透明度) */
+      z-index: 2000; /* ARシーンや他のUIより高く */
+      display: none; /* 初期状態は非表示 */
+      
+      /* テキスト配置のための設定 */
+      display: none; 
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+      font-family: 'DotGothic16', sans-serif;
+      font-size: 1.5em;
+      pointer-events: auto; /* タッチイベントをブロックする */
+      ">
+      <p id="guidance-text" style="
+          background-color: rgba(255, 255, 255, 0.1); /* テキスト背景を薄く */
+          padding: 20px;
+          border-radius: 10px;
+      ">マーカー全体をカメラに移してね</p>
+    </div>
+
+    <div id="permission-denied-overlay" style="
+        /* 画面全体を覆い、他の要素の上に配置 */
+        position: absolute; 
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        
+        /* 📌 背景とレイヤー */
+        background-color: rgba(34, 34, 34, 0.95); /* 濃い半透明の黒 */
+        color: white; 
+        z-index: 99999; /* 他のどのUIよりも高いレイヤー */
+        
+        /* 📌 中央配置とテキストスタイル */
+        display: none; /* 初期状態は非表示 (JSで表示を制御) */
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        font-family: 'DotGothic16', sans-serif;
+        padding: 20px;
+    ">
+        
+        <h1 style="color: #FF6347; font-size: 2.2em; margin-bottom: 15px;">
+            カメラアクセスが拒否されました 🚫
+        </h1>
+        
+        <p id="denial-message" style="
+            max-width: 80%;
+            font-size: 1.2em;
+            line-height: 1.8;
+            padding: 15px;
+            border: 2px solid #FF6347; /* エラーを示す赤い枠線 */
+            border-radius: 8px;
+            background-color: rgba(255, 99, 71, 0.1); /* 薄い赤の背景 */
+        ">
+            AR体験を開始できませんでした。<br><br>
+            **解決方法：**<br>
+            1. ブラウザの設定（アドレスバーの鍵マークなど）を開く。<br>
+            2. このサイトのカメラ権限を**「許可」**に変更する。<br>
+            3. ページをリロード（再読み込み）してください。
+        </p>
+
+        <button onclick="window.location.reload();" style="
+            padding: 12px 25px; 
+            font-size: 1.1em; 
+            margin-top: 30px;
+            background-color: #4CAF50; /* 許可後のアクションを促す緑色 */
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer;
+        ">ページをリロードする</button>
+
+    </div>
+
+    <div id="loading-overlay" style="
+        /* 画面全体に固定 */
+        position: fixed; 
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        
+        /* 背景とレイヤー */
+        background-color: #1a1a1a; 
+        color: #00ff88; 
+        z-index: 9999; 
+        
+        /* 中央配置 */
+        display: flex; 
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        
+        /* フォントスタイル */
+        font-family: monospace, sans-serif; 
+        font-size: 1.8em;
+    ">
+        <div id="spinner-container" style="
+            border: 4px solid rgba(0, 255, 136, 0.2); /* 薄い緑色の枠 */
+            border-top: 4px solid #00ff88; /* 濃い緑色のトップ枠 */
+            border-radius: 50%; /* 完全な円形 */
+            width: 50px;
+            height: 50px;
+            margin-bottom: 20px;
+            /* アニメーションを適用するためのCSSクラスをJSから操作するか、または外部/内部<style>で適用 */
+            animation: spin 1s linear infinite; /* 外部<style>で定義する */
+        "></div>
+
+        <div>RESOURCES LOADING...</div>
+    </div>
+
+    <style>
+    /* =================================== */
+    /* 必須: 回転アニメーションの定義 */
+    /* =================================== */
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* ⚠️ 注意: id="spinner-container" に直接 animation プロパティを適用する代わりに、
+      ここでクラスやIDを使ってアニメーションを適用することができません。
+      そのため、上記のHTMLでは animation: spin 1s linear infinite; をインラインで記述しましたが、
+      ブラウザによっては無効になる可能性があります。その場合は、この<style>ブロックに
+      #spinner-container { animation: spin 1s linear infinite; } を追加してください。 */
+
+    /* =================================== */
+    /* 既存のネオン風点滅効果 (オプション) */
+    /* =================================== */
+    @keyframes pulse {
+        from { box-shadow: 0 0 5px rgba(0, 255, 136, 0.5); }
+        to { box-shadow: 0 0 20px rgba(0, 255, 136, 1.0); }
+    }
+
+    /* 必要に応じて、ネオン効果を適用したい要素 (例: #global-loader の中の div) に適用 */
+    #global-loader > div:nth-child(2) { /* RESOURCES LOADING... のコンテナ */
+        animation: pulse 1.5s infinite alternate;
+    }
+    </style>
+
+    
+    <a-scene embedded arjs="debugUIEnabled:false" device-orientation-permission-ui="enabled: false" renderer="logarithmicDepthBuffer: true" xr-mode-ui="enabled: false">
+      <a-assets>
+        <a-asset-item id="yuusya" src="assets/yuusya.glb"></a-asset-item>
+        <a-asset-item id="kuma" src="assets/kuma.glb"></a-asset-item>
+        <a-asset-item id="kenja" src="assets/kenja.glb"></a-asset-item>
+      </a-assets>
+
+      <!-- <a-marker type="pattern" url="kuma/kuma.patt" registerevents>
+        <a-entity gltf-model="#yuusya" scale="0.5 0.5 0.5" animation-mixer></a-entity>
+      </a-marker> -->
+
+      <a-marker preset="hiro" registerevents id="yuusya">
+        <a-entity gltf-model="#yuusya" scale="0.5 0.5 0.5" animation-mixer></a-entity>
+      </a-marker>
+
+      <a-marker preset="kanji" registerevents id="kuma">
+        <a-entity gltf-model="#kuma" scale="0.5 0.5 0.5" animation-mixer></a-entity>
+      </a-marker>
+
+
+      <a-entity camera></a-entity>
+      
+    </a-scene>
+  </body>
+
+  <script>
+  </script>
+</html>
