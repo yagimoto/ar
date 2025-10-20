@@ -21,8 +21,9 @@
           // TODO: Add your own code here to react to the marker being found.
           toggleoverlay();
           IsmessageOn = true;
-          message = returnmessage(markerId);
-          startTypewriter(markerId, message);
+
+          characterJSON = returnmessage(markerId);
+          startTypewriter(characterJSON.dialogue, characterJSON.join_message);
         });
 
         marker.addEventListener('markerLost', function() {
@@ -39,29 +40,30 @@
     let charIndex = 0;
     let IsmessageOn = true;
 
-    function startTypewriter(markerId, message) {
+    function startTypewriter(dialogue, join_message) {
       if (!IsmessageOn) {
         return;
       }
-      const divelement = document.getElementById('screen-text-overlay');
-      divelement.style.display = 'flex';
+      showelement('screen-text-overlay');
 
       const outputElement = document.getElementById('typewriter-output');
-      const fullMessage = message;
-      console.log(fullMessage)
       const speed = 150;
       
-      if (charIndex < fullMessage.length) {
-        outputElement.innerText = fullMessage.substring(0, charIndex + 1);
+      if (charIndex < dialogue.length + join_message.length) {
+
+        if (charIndex > dialogue.length) {
+          outputElement.innerText = join_message.substring(0, charIndex - dialogue.length + 1);
+        } else {
+          outputElement.innerText = dialogue.substring(0, charIndex + 1);
+        }
+
         charIndex++;
-
-
-        
+               
         setTimeout(() => {
-          startTypewriter(markerId, message); 
+          startTypewriter(dialogue, join_message); 
         }, speed);
         
-      }
+      }     
     }
 
     async function loadmessage() {
@@ -91,7 +93,7 @@
     
     function returnmessage(markerId) {
       const charactersjson = charJSON.find(char => char.id === markerId);
-      return charactersjson.dialogue[0];
+      return charactersjson;
     }
 
     
@@ -341,11 +343,15 @@
       </a-marker> -->
 
       <a-marker preset="hiro" registerevents id="yuusya">
-        <a-entity gltf-model="#yuusya" scale="0.5 0.5 0.5" animation-mixer></a-entity>
+        <a-entity gltf-model="#yuusya" scale="0.25 0.25 0.25" animation-mixer></a-entity>
       </a-marker>
 
       <a-marker preset="kanji" registerevents id="kuma">
         <a-entity gltf-model="#kuma" scale="0.5 0.5 0.5" animation-mixer></a-entity>
+      </a-marker>
+
+      <a-marker type="pattern" url="patt/kuma.patt" registerevents id="yuusya">
+        <a-entity gltf-model="#kenja" scale="0.25 0.25 0.25" animation-mixer></a-entity>
       </a-marker>
 
 
