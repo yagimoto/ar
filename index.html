@@ -10,6 +10,20 @@
   <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v5.0.0/dist/aframe-extras.min.js"></script>
 
   <script>
+
+    let charIndex = 0;
+    let IsmessageOn = true;
+
+    let markerStatus = null;
+
+    const messages = {
+      'kenja': '勇者よ！ まさか本当に会えるとは....\n！我はドラゴンの盟友。召喚の儀式の全てを知る者だ\n\n賢者が仲間になった！\n\n\nキーワードは....「な」だ',
+      'kuma': '我は運命の導き手！お前の中には、確かに誠実な心がある。力を貸そう。\n\n大精霊が仲間になった！\n\n\nキーワードは....「か」だ',
+      'yuusya': '我は情熱を司る者！ドラゴンを召喚する志、気に入った！\n\n原初の炎が仲間になった！\n\n\nキーワードは....「ま」だ'
+    }
+
+    localStorage.setItem(getURLparam('char'), 1);
+    
     AFRAME.registerComponent('registerevents', {
       init: function () {
         var marker = this.el;
@@ -19,11 +33,12 @@
           console.log('markerFound', markerId);
 
           // TODO: Add your own code here to react to the marker being found.
-          toggleoverlay();
-          IsmessageOn = true;
+          markerStatus = 'Found';
 
-          characterJSON = returnmessage(markerId);
-          startTypewriter(characterJSON.dialogue, characterJSON.join_message);
+          hideelement('full-screen-overlay');
+                    
+          IsmessageOn = true;
+          startTypewriter(messages[markerId]);
         });
 
         marker.addEventListener('markerLost', function() {
@@ -31,16 +46,16 @@
           console.log('markerLost', markerId);
 
           // TODO: Add your own code here to react to the marker being lost.
-          toggleoverlay();
+          markerStatus = 'Lost';
+          
+          showCameraGuide();
           IsmessageOn = false;
         });
       }
     });
 
-    let charIndex = 0;
-    let IsmessageOn = true;
 
-    function startTypewriter(dialogue, join_message) {
+    function startTypewriter(dialogue) {
       if (!IsmessageOn) {
         return;
       }
@@ -49,63 +64,28 @@
       const outputElement = document.getElementById('typewriter-output');
       const speed = 150;
       
-      if (charIndex < dialogue.length + join_message.length) {
-
-        if (charIndex > dialogue.length) {
-          outputElement.innerText = join_message.substring(0, charIndex - dialogue.length + 1);
-        } else {
-          outputElement.innerText = dialogue.substring(0, charIndex + 1);
-        }
-
+      if (charIndex < dialogue.length) {
+        outputElement.innerText = dialogue.substring(0, charIndex + 1);
+        
         charIndex++;
                
         setTimeout(() => {
-          startTypewriter(dialogue, join_message); 
+          startTypewriter(dialogue); 
         }, speed);
-        
-      }     
-    }
 
-    async function loadmessage() {
-      const response = await fetch('message.json');
-
-      if(!response.ok) {
-        console.log("JSONファイルを読み込めませんでした");
-      }
-
-      const JSONmessage = await response.json();
-      
-      return JSONmessage.characters;
-      
-    }
-
-    let charJSON;
-    
-    (async () => {
-      charJSON = await loadmessage();
-      
-      if (charJSON) {
-          console.log(charJSON);
       } else {
-          console.log("データが見つかりませんでした。");
-      }
-    })();
-    
-    function returnmessage(markerId) {
-      const charactersjson = charJSON.find(char => char.id === markerId);
-      return charactersjson;
-    }
-
-    
-    function toggleoverlay() {
-      const overlay = document.getElementById('full-screen-overlay');
-      if (overlay.style.display == 'flex') {
-        overlay.style.display = 'none';
-      } else {
-        overlay.style.display = 'flex';
+        return;
       }
     }
-
+    
+    function showCameraGuide() {
+      setTimeout(() => {
+          if (markerStatus === 'Lost') {
+              showelement('full-screen-overlay'); 
+          }
+      }, 1000);
+    }
+    
     function showelement(id) {
       const element = document.getElementById(id);
       element.style.display = 'flex';
@@ -114,6 +94,30 @@
     function hideelement(id) {
       const element = document.getElementById(id);
       element.style.display = 'none';
+    }
+
+    function getURLparam(id) {
+      // 文字列としてURLを取得する。
+      let url_string = window.location.href;
+      // 文字列としてのURLをURLオブジェクトに変換する。
+      let url = new URL(url_string);
+      // URLオブジェクトのsearchParamsのget関数でIDがdの値を取得する。
+      let data=url.searchParams.get(id);
+      // "d"というIDが定義されていない場合はnullが入る
+
+      return data;
+    }
+
+    function DeleteCharElm() {
+      const char = getURLparam('char');
+
+      const charList = ['kenja', 'kuma', 'yuusya'];
+      const deleteLists = charList.filter(item => item != char);
+
+      for (const deletelist of deleteLists) {
+        document.getElementById(deletelist).remove();
+        console.log(deletelist);
+      }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -151,6 +155,8 @@
   
       observer.observe(targetNode, config);
     });
+    
+    document.addEventListener('DOMContentLoaded', DeleteCharElm);
   </script>
   
   <body style="margin : 0px; overflow: hidden;">
@@ -204,7 +210,7 @@
           background-color: rgba(255, 255, 255, 0.1); /* テキスト背景を薄く */
           padding: 20px;
           border-radius: 10px;
-      ">マーカー全体をカメラに移してね</p>
+      ">QRコードをカメラにかざしてね</p>
     </div>
 
     <div id="permission-denied-overlay" style="
@@ -331,27 +337,37 @@
     </style>
 
     
-    <a-scene embedded arjs="debugUIEnabled:false" device-orientation-permission-ui="enabled: false" renderer="logarithmicDepthBuffer: true" xr-mode-ui="enabled: false">
+    <a-scene embedded arjs="debugUIEnabled:false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;" device-orientation-permission-ui="enabled: false" renderer="logarithmicDepthBuffer: true" xr-mode-ui="enabled: false">
       <a-assets>
         <a-asset-item id="yuusya" src="assets/yuusya.glb"></a-asset-item>
         <a-asset-item id="kuma" src="assets/kuma.glb"></a-asset-item>
         <a-asset-item id="kenja" src="assets/kenja.glb"></a-asset-item>
+        
+        <a-asset-item id="penlight" src="assets/SubAssets/penlight.glb"></a-asset-item>
       </a-assets>
+<!-- 
+      <a-marker type='barcode' value='0' registerevents id="yuusya">
+        <a-entity gltf-model="#yuusya" scale="1 1 1" animation-mixer></a-entity>
+      </a-marker>
 
-      <!-- <a-marker type="pattern" url="kuma/kuma.patt" registerevents>
-        <a-entity gltf-model="#yuusya" scale="0.5 0.5 0.5" animation-mixer></a-entity>
-      </a-marker> -->
+      <a-marker type='barcode' value='1' registerevents id="kuma">
+        <a-entity gltf-model="#kuma" scale="1 1 1" animation-mixer></a-entity>
+      </a-marker>
 
-      <a-marker preset="hiro" registerevents id="yuusya">
+      <a-marker type='barcode' value='2' registerevents id="kenja">
+        <a-entity gltf-model="#kenja" scale="1 1 1" animation-mixer></a-entity>
+      </a-marker>
+ -->
+      <a-marker type="pattern" url="patt\pattern-yuusya.patt" registerevents id="yuusya">
         <a-entity gltf-model="#yuusya" scale="0.25 0.25 0.25" animation-mixer></a-entity>
       </a-marker>
 
-      <a-marker preset="kanji" registerevents id="kuma">
-        <a-entity gltf-model="#kuma" scale="0.5 0.5 0.5" animation-mixer></a-entity>
+      <a-marker type="pattern" url="patt\pattern-kuma.patt" registerevents id="kuma">
+        <a-entity gltf-model="#kuma" scale="0.25 0.25 0.25" animation-mixer></a-entity>
       </a-marker>
 
-      <a-marker type="pattern" url="patt/kuma.patt" registerevents id="yuusya">
-        <a-entity gltf-model="#kenja" scale="0.25 0.25 0.25" animation-mixer></a-entity>
+      <a-marker type="pattern" url="patt\pattern-kenja.patt" registerevents id="kenja">
+        <a-entity gltf-model="#kenja" scale="0.25 0.25 0.25" rotation="0 180 0" animation-mixer></a-entity>
       </a-marker>
 
 
@@ -361,5 +377,6 @@
   </body>
 
   <script>
+    DeleteCharElm()
   </script>
 </html>
