@@ -31,6 +31,8 @@
         if (charIndex < dialogue.length) {
             outputElement.innerText = dialogue.substring(0, charIndex + 1);
             
+            outputdiv.scrollTop = outputdiv.scrollHeight;
+            
             charIndex++;
                     
             setTimeout(() => {
