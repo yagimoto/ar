@@ -16,8 +16,7 @@
     </a-assets>
 
     <a-camera gps-new-camera=''></a-camera>
-    <!-- <a-entity material='color: red' geometry='primitive: box' gps-new-entity-place="latitude: 26.526467871116914; longitude: 128.0312157122256" scale="10 10 10"></a-entity> -->
-    <a-entity
+    <!-- <a-entity
         gps-new-entity-place="latitude: 0; longitude: 0"
         gltf-model="#doragon"
         scale="7 7 7"
@@ -26,31 +25,46 @@
         look-at="[gps-new-camera]"
         animation-mixer="clip: BreathAttack"
         id="doragon-entity"
-    ></a-entity>
+    ></a-entity> -->
 
 </a-scene>
 
 <script>
-    window.addEventListener('load', () => {
-        navigator.geolocation.getCurrentPosition(success,fail);
-    
-        function success(pos) {
-            const elm = document.getElementById('doragon-entity')
-    
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
-    
-            console.log(lat, lng);
-    
-            elm.setAttribute('gps-new-entity-place', `latitude: ${lat}; longitude: ${lng}`)
-    
-        }
-    
-        function fail(error) {
-    
-        }
+    navigator.geolocation.getCurrentPosition(success,fail);
 
-    })
+    function success(pos) {
+        const scene = document.querySelector('a-scene');
+
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        
+        const newEntity = document.createElement('a-entity');
+        
+        newEntity.setAttribute('gps-new-entity-place', {
+            latitude: lat,
+            longitude: lng
+        });
+
+        // gltf-modelは、既存のアセットIDを使用
+        newEntity.setAttribute('gltf-model', '#doragon'); 
+        
+        // その他の視覚的属性を設定
+        newEntity.setAttribute('scale', '7 7 7');
+        newEntity.setAttribute('rotation', '0 0 0');
+        newEntity.setAttribute('position', '0 3 0'); // ユーザーの足元を基準にY=3m
+        newEntity.setAttribute('look-at', '[gps-new-camera]');
+        newEntity.setAttribute('animation-mixer', "clip: BreathAttack");
+
+        scene.appendChild(newEntity);
+
+    }
+
+    function fail(error) {
+
+    }
+
+
 </script>
+
 </body>
 </html>
