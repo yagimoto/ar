@@ -31,26 +31,26 @@
 </a-scene>
 
 <script>
-    // window.addEventListener('load', () => {
-    //     navigator.geolocation.getCurrentPosition(success,fail);
+    window.addEventListener('load', () => {
+        navigator.geolocation.getCurrentPosition(success,fail);
     
-    //     function success(pos) {
-    //         const elm = document.getElementById('doragon-entity')
+        function success(pos) {
+            const elm = document.getElementById('doragon-entity')
     
-    //         const lat = pos.coords.latitude;
-    //         const lng = pos.coords.longitude;
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
     
-    //         console.log(lat, lng);
+            console.log(lat, lng);
     
-    //         elm.setAttribute('gps-new-entity-place', `latitude: ${lat}; longitude: ${lng}`)
+            elm.setAttribute('gps-new-entity-place', `latitude: ${lat}; longitude: ${lng}`)
     
-    //     }
+        }
     
-    //     function fail(error) {
+        function fail(error) {
     
-    //     }
+        }
 
-    // })
+    })
 </script>
 </body>
 </html>
