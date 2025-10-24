@@ -8,7 +8,7 @@
 
 </head>
 <body>
-<a-scene vr-mode-ui='enabled: false' arjs='debugUIEnabled: false' renderer="">
+<a-scene vr-mode-ui='enabled: false' arjs='debugUIEnabled: false' renderer="antialias: true; logarithmicDepthBuffer: true">
     <a-assets>
         <a-asset-items id="doragon" src="assets/Doragon.glb" ></a-asset-items>
     </a-assets>
@@ -17,9 +17,9 @@
     <a-entity
         gps-new-entity-place="latitude: 26.5247988; longitude: 128.0302308"
         gltf-model="#doragon"
-        scale="1 1 1"
+        scale="20 20 20"
         rotation="0 0 0"
-        position="0 3 0"
+        position="0 100 0"
         id="doragon-entity"
     ></a-entity>
 
