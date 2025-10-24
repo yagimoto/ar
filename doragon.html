@@ -12,9 +12,9 @@
     let charIndex = 0;
     let IsmessageOn = true;
     
-    let message = "よくぞ此処まで辿り着いた、勇者よ。\n\n我は運命の竜。\n\n時の流れと縁の糸を紡ぐ者。\n其方には「誠実」「情熱」「信念」がある。\n\n汝を仲間と認めた者たちが、その証明だ。\n\n我はそれに応え、その魂に「祝福」を与える。\n闇に迷う事があろうとも、光が道を照らすであろう。\n\n今この刻より、其方は真なる英雄として歩み出す。";
+    let dialogue = "よくぞ此処まで辿り着いた、勇者よ。\n\n我は運命の竜。\n\n時の流れと縁の糸を紡ぐ者。\n其方には「誠実」「情熱」「信念」がある。\n\n汝を仲間と認めた者たちが、その証明だ。\n\n我はそれに応え、その魂に「祝福」を与える。\n闇に迷う事があろうとも、光が道を照らすであろう。\n\n今この刻より、其方は真なる英雄として歩み出す。";
 
-    function startTypewriter(dialogue) {
+    function startTypewriter() {
         if (!IsmessageOn) {
             return;
         }
@@ -37,6 +37,12 @@
             return;
         }
     }
+
+    window.onload = function () {
+        document.addEventListener("click", function () {
+            startTypewriter();
+        });
+    };
 
 </script>
 
@@ -85,8 +91,5 @@
     <p id="typewriter-output"></p>
 </div>
 
-<script>
-    startTypewriter(message)
-</script>
 </body>
 </html>
