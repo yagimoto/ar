@@ -18,9 +18,11 @@
         if (!IsmessageOn) {
             return;
         }
-
+        
         const outputElement = document.getElementById('typewriter-output');
         const speed = 150;
+        
+        outputElement.style.display = 'flex';
         
         if (charIndex < dialogue.length) {
             outputElement.innerText = dialogue.substring(0, charIndex + 1);
