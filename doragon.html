@@ -5,6 +5,7 @@
 <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 <script type='text/javascript' src='https://raw.githack.com/AR-js-org/AR.js/3.4.7/three.js/build/ar-threex-location-only.js'></script>
 <script type='text/javascript' src='https://raw.githack.com/AR-js-org/AR.js/3.4.7/aframe/build/aframe-ar.js'></script>
+<script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
 
 </head>
 <body>
@@ -13,13 +14,14 @@
         <a-asset-items id="doragon" src="assets/Doragon.glb" ></a-asset-items>
     </a-assets>
 
-    <a-camera gps-new-camera=''></a-camera>
+    <a-camera gps-new-camera rotation-reader></a-camera>
     <a-entity
         gps-new-entity-place="latitude: 26.5247988; longitude: 128.0302308"
         gltf-model="#doragon"
         scale="20 20 20"
         rotation="0 0 0"
         position="0 100 0"
+        look-at="[gps-camera]"
         id="doragon-entity"
     ></a-entity>
 
