@@ -32,7 +32,7 @@
             outputElement.innerText = dialogue.substring(0, charIndex + 1);
             
             outputdiv.scrollTop = outputdiv.scrollHeight;
-            
+
             charIndex++;
                     
             setTimeout(() => {
@@ -44,13 +44,32 @@
         }
     }
 
+    function detectBrowser() {
+        var userAgent = window.navigator.userAgent.toLowerCase();
+
+        if(userAgent.indexOf('msie') != -1 ||
+                userAgent.indexOf('trident') != -1) {
+            console.log('Internet Explorer');
+        } else if(userAgent.indexOf('edge') != -1) {
+            console.log('Edge');
+        } else if(userAgent.indexOf('chrome') != -1) {
+            console.log('Google Chrome');
+        } else if(userAgent.indexOf('safari') != -1) {
+            console.log('Safari');
+            document.getElementById('browser-popup').style.display = 'flex';
+        } else if(userAgent.indexOf('firefox') != -1) {
+            console.log('FireFox');
+        } else if(userAgent.indexOf('opera') != -1) {
+            console.log('Opera');
+        } else {
+            console.log('そんなブラウザは知らん');
+        }
+    }
     window.onload = function () {
         document.addEventListener("click", function () {
             startTypewriter();
         });
     };
-
-    document.addEventListener('load', console.log('loaded'));
 
 </script>
 
@@ -73,6 +92,9 @@
 
     </a-scene>
 
+    <div id="browser-popup" style="display: none;">
+        <p>google chromeを使用してください</p>
+    </div>
 
     <div id="screen-text-overlay" style="
         /* 配置とレイヤーはそのまま */
