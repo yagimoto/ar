@@ -7,6 +7,38 @@
 <script type='text/javascript' src='https://raw.githack.com/AR-js-org/AR.js/3.4.7/aframe/build/aframe-ar.js'></script>
 <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v5.0.0/dist/aframe-extras.min.js"></script>
 
+<script>
+
+    let charIndex = 0;
+    let IsmessageOn = true;
+    
+    let message = "よくぞ此処まで辿り着いた、勇者よ。\n\n我は運命の竜。\n\n時の流れと縁の糸を紡ぐ者。\n其方には「誠実」「情熱」「信念」がある。\n\n汝を仲間と認めた者たちが、その証明だ。\n\n我はそれに応え、その魂に「祝福」を与える。\n闇に迷う事があろうとも、光が道を照らすであろう。\n\n今この刻より、其方は真なる英雄として歩み出す。";
+
+    function startTypewriter(dialogue) {
+        if (!IsmessageOn) {
+        return;
+        }
+        showelement('screen-text-overlay');
+
+        const outputElement = document.getElementById('typewriter-output');
+        const speed = 150;
+        
+        if (charIndex < dialogue.length) {
+        outputElement.innerText = dialogue.substring(0, charIndex + 1);
+        
+        charIndex++;
+                
+        setTimeout(() => {
+            startTypewriter(dialogue); 
+        }, speed);
+
+        } else {
+        return;
+        }
+    }
+
+    document.addEventListener('load', startTypewriter(message));
+</script>
 
 </head>
 <body>
@@ -28,42 +60,30 @@
 
 </a-scene>
 
-<script>
-    // navigator.geolocation.getCurrentPosition(success,fail);
 
-    // function success(pos) {
-    //     const scene = document.querySelector('a-scene');
+<div id="screen-text-overlay" style="
+    /* 配置とレイヤーはそのまま */
+    position: absolute; 
+    
+    /* 📌 修正点 1: bottom を指定 */
+    bottom: 20px; /* 画面下端から 20px 上に配置 */
+    
+    left: 50%; 
+    transform: translateX(-50%); /* 中央揃えのまま */
+    z-index: 1000; 
 
-    //     const lat = pos.coords.latitude;
-    //     const lng = pos.coords.longitude;
-        
-    //     const newEntity = document.createElement('a-entity');
-        
-    //     newEntity.setAttribute('gps-new-entity-place', {
-    //         latitude: lat,
-    //         longitude: lng
-    //     });
+    /* 背景とボーダーの設定 */
+    color: white; 
+    background-color: rgba(0, 0, 0, 0.8); 
+    padding: 10px; 
+    font-family: 'DotGothic16', sans-serif;
+    border: 3px solid white; 
+    border-radius: 8px; 
 
-    //     // gltf-modelは、既存のアセットIDを使用
-    //     newEntity.setAttribute('gltf-model', '#doragon'); 
-        
-    //     // その他の視覚的属性を設定
-    //     newEntity.setAttribute('scale', '1 1 1');
-    //     newEntity.setAttribute('rotation', '0 0 0');
-    //     newEntity.setAttribute('position', '0 7 0'); // ユーザーの足元を基準にY=3m
-    //     //newEntity.setAttribute('look-at', '[gps-new-camera]');
-    //     //newEntity.setAttribute('animation-mixer', "clip: BreathAttack");
-
-    //     scene.appendChild(newEntity);
-
-    // }
-
-    // function fail(error) {
-
-    // }
-
-
-</script>
+    display: none;
+">
+    <p id="typewriter-output"></p>
+</div>
 
 </body>
 </html>
