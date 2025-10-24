@@ -65,7 +65,10 @@
             console.log('そんなブラウザは知らん');
         }
     }
+
     window.onload = function () {
+        detectBrowser();
+        
         document.addEventListener("click", function () {
             startTypewriter();
         });
