@@ -14,52 +14,51 @@
     </a-assets>
 
     <a-camera gps-new-camera=''></a-camera>
-    <!-- <a-entity
-        gps-new-entity-place="latitude: 0; longitude: 0"
+    <a-entity
+        gps-new-entity-place="latitude: 26.5247988; longitude: 128.0302308"
         gltf-model="#doragon"
         scale="7 7 7"
         rotation="0 0 0"
         position="0 3 0"
         look-at="[gps-new-camera]"
-        animation-mixer="clip: BreathAttack"
         id="doragon-entity"
-    ></a-entity> -->
+    ></a-entity>
 
 </a-scene>
 
 <script>
-    navigator.geolocation.getCurrentPosition(success,fail);
+    // navigator.geolocation.getCurrentPosition(success,fail);
 
-    function success(pos) {
-        const scene = document.querySelector('a-scene');
+    // function success(pos) {
+    //     const scene = document.querySelector('a-scene');
 
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
+    //     const lat = pos.coords.latitude;
+    //     const lng = pos.coords.longitude;
         
-        const newEntity = document.createElement('a-entity');
+    //     const newEntity = document.createElement('a-entity');
         
-        newEntity.setAttribute('gps-new-entity-place', {
-            latitude: lat,
-            longitude: lng
-        });
+    //     newEntity.setAttribute('gps-new-entity-place', {
+    //         latitude: lat,
+    //         longitude: lng
+    //     });
 
-        // gltf-modelは、既存のアセットIDを使用
-        newEntity.setAttribute('gltf-model', '#doragon'); 
+    //     // gltf-modelは、既存のアセットIDを使用
+    //     newEntity.setAttribute('gltf-model', '#doragon'); 
         
-        // その他の視覚的属性を設定
-        newEntity.setAttribute('scale', '1 1 1');
-        newEntity.setAttribute('rotation', '0 0 0');
-        newEntity.setAttribute('position', '0 7 0'); // ユーザーの足元を基準にY=3m
-        //newEntity.setAttribute('look-at', '[gps-new-camera]');
-        //newEntity.setAttribute('animation-mixer', "clip: BreathAttack");
+    //     // その他の視覚的属性を設定
+    //     newEntity.setAttribute('scale', '1 1 1');
+    //     newEntity.setAttribute('rotation', '0 0 0');
+    //     newEntity.setAttribute('position', '0 7 0'); // ユーザーの足元を基準にY=3m
+    //     //newEntity.setAttribute('look-at', '[gps-new-camera]');
+    //     //newEntity.setAttribute('animation-mixer', "clip: BreathAttack");
 
-        scene.appendChild(newEntity);
+    //     scene.appendChild(newEntity);
 
-    }
+    // }
 
-    function fail(error) {
+    // function fail(error) {
 
-    }
+    // }
 
 
 </script>
