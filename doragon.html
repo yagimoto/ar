@@ -74,6 +74,15 @@
         elm.style.display = 'none';
     }
     
+    AFRAME.registerComponent('model-loader', {
+    init: function () {
+        this.el.addEventListener('model-loaded', function () {
+        // ここに処理を記載
+        console.log('Finish load');
+        });
+    }
+    });
+
     window.onload = function () {
         //detectBrowser();
     };
@@ -95,6 +104,7 @@
             position="0 100 0"
             animation-mixer="clip: Flying"
             id="doragon-entity"
+            model-loader
         ></a-entity>
 
     </a-scene>
