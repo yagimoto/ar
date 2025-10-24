@@ -16,24 +16,23 @@
 
     function startTypewriter(dialogue) {
         if (!IsmessageOn) {
-        return;
+            return;
         }
-        showelement('screen-text-overlay');
 
         const outputElement = document.getElementById('typewriter-output');
         const speed = 150;
         
         if (charIndex < dialogue.length) {
-        outputElement.innerText = dialogue.substring(0, charIndex + 1);
-        
-        charIndex++;
-                
-        setTimeout(() => {
-            startTypewriter(dialogue); 
-        }, speed);
+            outputElement.innerText = dialogue.substring(0, charIndex + 1);
+            
+            charIndex++;
+                    
+            setTimeout(() => {
+                startTypewriter(dialogue); 
+            }, speed);
 
         } else {
-        return;
+            return;
         }
     }
 
