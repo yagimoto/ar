@@ -167,6 +167,43 @@
         </div>
     </div>
 
+    <div id="loading-overlay" style="
+        /* 画面全体に固定 */
+        position: fixed; 
+        top: 0; left: 0; right: 0; bottom: 0;
+        z-index: 1500; 
+
+        /* 背景と中央配置 */
+        background-color: rgba(0, 0, 0, 0.8); /* 半透明の黒 */
+        display: flex;
+        flex-direction: column; 
+        justify-content: center; /* 垂直方向の中央寄せ */
+        align-items: center; /* 水平方向の中央寄せ */
+        
+        /* 初期状態は表示 */
+        display: flex; 
+    ">
+        <p style="
+            color: white; 
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px; 
+        ">
+            ロード中...
+        </p>
+
+        <div style="
+            /* スピナーの基本的なデザイン */
+            border: 4px solid rgba(255, 255, 255, 0.3); 
+            border-top: 4px solid white; 
+            border-radius: 50%; 
+            width: 30px; 
+            height: 30px;
+            /* 注意: インラインスタイルではCSSアニメーション 'spin' は定義できないため、
+            このスピナーは回転しません。アニメーションは <style> タグが必要です。 */
+        "></div>
+    </div>
+
     <button 
         id="action-button" 
         style="
