@@ -77,8 +77,10 @@
     AFRAME.registerComponent('model-loader', {
     init: function () {
         this.el.addEventListener('model-loaded', function () {
-        // ここに処理を記載
-        console.log('Finish load');
+            // ここに処理を記載
+            console.log('Finish load');
+            const elm = document.getElementById('loading-overlay');
+            elm.style.display = 'none';
         });
     }
     });
